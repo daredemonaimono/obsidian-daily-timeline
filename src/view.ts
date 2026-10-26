@@ -131,7 +131,6 @@ export class TimelineView extends ItemView {
     for (const { day, posts } of loaded) {
       if (!posts.length) continue;
       any = true;
-      this.listEl.createDiv({ cls: "dt-day", text: day.date.format("YYYY年M月D日 (ddd)") });
       for (const p of sortNewestFirst(posts)) this.renderPost(this.listEl, p, day, 0);
     }
     if (!any) this.listEl.createDiv({ cls: "dt-empty", text: "まだポストがありません" });

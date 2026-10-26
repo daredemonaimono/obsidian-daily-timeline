@@ -1,6 +1,6 @@
 {
   "name": "obsidian-daily-timeline",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Obsidian plugin: browse and post to your daily notes through a Twitter-style timeline.",
   "main": "main.js",
   "scripts": {

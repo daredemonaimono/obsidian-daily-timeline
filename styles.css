@@ -23,13 +23,6 @@
   padding-bottom: 96px;
 }
 
-.dt-day {
-  padding: 8px 16px;
-  font-size: var(--font-ui-smaller);
-  color: var(--text-faint);
-  border-bottom: 1px solid var(--background-modifier-border);
-}
-
 .dt-empty {
   padding: 48px 16px;
   text-align: center;
