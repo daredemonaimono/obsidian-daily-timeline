@@ -1,4 +1,4 @@
-# Daily Timeline
+# Obitter
 
 Obsidian plugin that shows your daily notes as a Twitter-style timeline.
 

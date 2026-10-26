@@ -29,7 +29,7 @@ export class TimelineView extends ItemView {
     return VIEW_TYPE;
   }
   getDisplayText() {
-    return "Daily timeline";
+    return "Obitter";
   }
   getIcon() {
     return "message-circle";

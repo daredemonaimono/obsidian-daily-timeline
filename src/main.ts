@@ -23,10 +23,10 @@ export default class DailyTimelinePlugin extends Plugin {
   async onload() {
     await this.loadSettings();
     this.registerView(VIEW_TYPE, (leaf) => new TimelineView(leaf, this));
-    this.addRibbonIcon("message-circle", "Open daily timeline", () => this.activateView());
+    this.addRibbonIcon("message-circle", "Open Obitter", () => this.activateView());
     this.addCommand({
       id: "open-daily-timeline",
-      name: "Open daily timeline",
+      name: "Open Obitter",
       callback: () => this.activateView(),
     });
     this.addSettingTab(new TimelineSettingTab(this.app, this));
