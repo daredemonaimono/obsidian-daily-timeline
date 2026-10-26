@@ -41,15 +41,6 @@ export class TimelineView extends ItemView {
     root.empty();
     root.addClass("dt-view");
 
-    const header = root.createDiv("dt-header");
-    const gear = header.createEl("button", { cls: "dt-icon-btn clickable-icon", attr: { "aria-label": "Settings" } });
-    setIcon(gear, "settings");
-    gear.addEventListener("click", () => {
-      const setting = (this.app as any).setting;
-      setting.open();
-      setting.openTabById(this.plugin.manifest.id);
-    });
-
     this.scrollEl = root.createDiv("dt-scroll");
     this.listEl = this.scrollEl.createDiv("dt-list");
     this.scrollEl.addEventListener("scroll", () => this.maybeLoadMore());

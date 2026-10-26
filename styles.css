@@ -5,13 +5,6 @@
   position: relative;
 }
 
-.dt-header {
-  display: flex;
-  justify-content: flex-end;
-  padding: 6px 12px;
-  flex: none;
-}
-
 .dt-scroll {
   flex: 1;
   overflow-y: auto;
