@@ -16,7 +16,6 @@ export class TimelineView extends ItemView {
   private scrollEl!: HTMLElement;
   private listEl!: HTMLElement;
   private shown = PAGE;
-  private composeOpen = false;
   private replyKey: string | null = null;
   private editKey: string | null = null;
   private dirty = false;
@@ -47,15 +46,6 @@ export class TimelineView extends ItemView {
     this.listEl = this.scrollEl.createDiv("dt-list");
     this.scrollEl.addEventListener("scroll", () => this.maybeLoadMore());
 
-    const fab = root.createEl("button", { cls: "dt-fab", attr: { "aria-label": "Post" } });
-    setIcon(fab, "pencil");
-    fab.addEventListener("click", () => {
-      this.composeOpen = !this.composeOpen;
-      this.replyKey = null;
-      this.editKey = null;
-      void this.render().then(() => this.listEl.querySelector<HTMLTextAreaElement>(".dt-compose textarea")?.focus());
-    });
-
     const onChange = debounce((f: unknown) => {
       if (f instanceof TFile && this.inScope(f)) this.refresh();
     }, 300);
@@ -65,6 +55,11 @@ export class TimelineView extends ItemView {
     this.registerEvent(this.app.vault.on("rename", onChange));
 
     await this.render();
+    this.focusTop();
+  }
+
+  private focusTop() {
+    this.listEl.querySelector<HTMLTextAreaElement>(".dt-top")?.focus();
   }
 
   async onClose() {
@@ -120,9 +115,10 @@ export class TimelineView extends ItemView {
 
     const scrollTop = this.scrollEl.scrollTop;
     document.querySelectorAll(".dt-suggest").forEach((e) => e.remove());
-    this.listEl.empty();
 
-    if (this.composeOpen) this.renderComposer(this.listEl, "ポスト", "いまどうしてる？", (t) => this.post(t));
+    const draft = this.listEl.querySelector<HTMLTextAreaElement>(".dt-top")?.value ?? "";
+    this.listEl.empty();
+    this.renderComposer(this.listEl, "ポスト", "いまどうしてる？", (t) => this.post(t), { initial: draft }).addClass("dt-top");
 
     let any = false;
     for (const { day, posts } of loaded) {
@@ -215,7 +211,6 @@ export class TimelineView extends ItemView {
     if (replies) replyBtn.createSpan({ cls: "dt-count", text: String(replies) });
     replyBtn.addEventListener("click", () => {
       this.replyKey = this.replyKey === key ? null : key;
-      this.composeOpen = false;
       this.editKey = null;
       void this.render().then(() => this.listEl.querySelector<HTMLTextAreaElement>(".dt-reply-compose textarea")?.focus());
     });
@@ -225,7 +220,6 @@ export class TimelineView extends ItemView {
     editBtn.addEventListener("click", () => {
       this.editKey = this.editKey === key ? null : key;
       this.replyKey = null;
-      this.composeOpen = false;
       void this.render().then(() => this.listEl.querySelector<HTMLTextAreaElement>(".dt-edit-compose textarea")?.focus());
     });
 
@@ -246,7 +240,7 @@ export class TimelineView extends ItemView {
     placeholder: string,
     onSubmit: (t: string) => Promise<void>,
     opts: { initial?: string; onCancel?: () => void } = {}
-  ) {
+  ): HTMLTextAreaElement {
     const box = parent.createDiv("dt-compose");
     const ta = box.createEl("textarea", { attr: { rows: "2", placeholder } });
     if (opts.initial) {
@@ -289,16 +283,17 @@ export class TimelineView extends ItemView {
       }
     });
     btn.addEventListener("click", () => void submit());
+    return ta;
   }
 
   private async post(text: string) {
     const file = await this.plugin.getOrCreateToday();
     const line = `- ${moment().format("HH:mm")} ${text.replace(/\r?\n/g, "<br>")}`;
     await this.app.vault.process(file, (d) => appendLine(d, line));
-    this.composeOpen = false;
     this.shown = Math.max(this.shown, PAGE);
     await this.render();
     this.scrollEl.scrollTop = 0;
+    this.focusTop();
   }
 
   private async reply(file: TFile, parent: Post, text: string) {

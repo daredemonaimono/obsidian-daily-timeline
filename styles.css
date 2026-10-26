@@ -197,30 +197,6 @@
   opacity: 0.5;
 }
 
-.dt-fab {
-  position: absolute;
-  right: 24px;
-  bottom: 24px;
-  width: 56px;
-  height: 56px;
-  padding: 0;
-  border-radius: 50%;
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-}
-
-.dt-fab:hover {
-  background: var(--interactive-accent-hover);
-}
-
-.dt-fab .svg-icon {
-  width: 24px;
-  height: 24px;
-}
 
 .dt-edit-compose .dt-compose {
   padding: 4px 0 0;
