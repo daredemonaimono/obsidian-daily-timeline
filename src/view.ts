@@ -1,5 +1,6 @@
 import { Component, ItemView, Keymap, MarkdownRenderer, Notice, TFile, WorkspaceLeaf, debounce, moment, setIcon } from "obsidian";
 import type DailyTimelinePlugin from "./main";
+import { ICON_ID } from "./main";
 import { Post, appendLine, countReplies, insertReply, parsePosts, sortNewestFirst } from "./parse";
 
 export const VIEW_TYPE = "daily-timeline-view";
@@ -32,7 +33,7 @@ export class TimelineView extends ItemView {
     return "Obitter";
   }
   getIcon() {
-    return "twitter";
+    return ICON_ID;
   }
 
   async onOpen() {
