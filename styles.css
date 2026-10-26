@@ -127,12 +127,15 @@
   margin-top: 6px;
 }
 
-.dt-action {
+.dt-view .dt-action,
+.dt-view .dt-action:hover,
+.dt-view .dt-action:active,
+.dt-view .dt-action:focus {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 2px 4px;
-  background: none;
+  background: transparent;
   border: none;
   box-shadow: none;
   height: auto;
@@ -150,17 +153,8 @@
   height: 16px;
 }
 
-.dt-reply:hover {
+.dt-view .dt-reply:hover {
   color: var(--interactive-accent);
-}
-
-.dt-like:hover,
-.dt-like.is-liked {
-  color: var(--color-red);
-}
-
-.dt-like.is-liked .svg-icon {
-  fill: currentColor;
 }
 
 .dt-compose {

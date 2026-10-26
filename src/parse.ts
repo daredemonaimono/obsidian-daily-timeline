@@ -86,15 +86,6 @@ function locate(lines: string[], lineNo: number, raw: string): number {
   return lines.indexOf(raw);
 }
 
-export function toggleLike(data: string, lineNo: number, raw: string): string | null {
-  const lines = data.split("\n");
-  const idx = locate(lines, lineNo, raw);
-  if (idx < 0) return null;
-  const line = lines[idx];
-  lines[idx] = line.endsWith(LIKE_MARK) ? line.slice(0, -LIKE_MARK.length) : line.replace(/\s+$/, "") + LIKE_MARK;
-  return lines.join("\n");
-}
-
 export function insertReply(data: string, parent: Post, replyLine: string): string | null {
   const lines = data.split("\n");
   const idx = locate(lines, parent.lineNo, parent.raw);
@@ -107,4 +98,16 @@ export function insertReply(data: string, parent: Post, replyLine: string): stri
   }
   lines.splice(end, 0, `${parent.indentStr}\t- ${replyLine}`);
   return lines.join("\n");
+}
+
+// Newest first by time of day; posts without a time inherit the previous timed post's.
+export function sortNewestFirst(posts: Post[]): Post[] {
+  let last = "00:00";
+  const keyed = posts.map((p) => {
+    if (p.time) last = p.time;
+    return { p, t: last };
+  });
+  return keyed
+    .sort((a, b) => (a.t === b.t ? b.p.lineNo - a.p.lineNo : a.t < b.t ? 1 : -1))
+    .map((k) => k.p);
 }

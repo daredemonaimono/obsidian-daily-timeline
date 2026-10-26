@@ -1,6 +1,6 @@
 import { Component, ItemView, Keymap, MarkdownRenderer, Notice, TFile, WorkspaceLeaf, debounce, moment, setIcon } from "obsidian";
 import type DailyTimelinePlugin from "./main";
-import { Post, appendLine, countReplies, insertReply, parsePosts, toggleLike } from "./parse";
+import { Post, appendLine, countReplies, insertReply, parsePosts, sortNewestFirst } from "./parse";
 
 export const VIEW_TYPE = "daily-timeline-view";
 const PAGE = 5;
@@ -132,7 +132,7 @@ export class TimelineView extends ItemView {
       if (!posts.length) continue;
       any = true;
       this.listEl.createDiv({ cls: "dt-day", text: day.date.format("YYYY年M月D日 (ddd)") });
-      for (const p of [...posts].reverse()) this.renderPost(this.listEl, p, day, 0);
+      for (const p of sortNewestFirst(posts)) this.renderPost(this.listEl, p, day, 0);
     }
     if (!any) this.listEl.createDiv({ cls: "dt-empty", text: "まだポストがありません" });
 
@@ -192,13 +192,6 @@ export class TimelineView extends ItemView {
       this.composeOpen = false;
       void this.render().then(() => this.listEl.querySelector<HTMLTextAreaElement>(".dt-reply-compose textarea")?.focus());
     });
-
-    const likeBtn = actions.createEl("button", {
-      cls: "dt-action dt-like" + (p.liked ? " is-liked" : ""),
-      attr: { "aria-label": "Like" },
-    });
-    setIcon(likeBtn.createSpan("dt-action-icon"), "heart");
-    likeBtn.addEventListener("click", () => void this.like(day.file, p));
 
     if (this.replyKey === key) {
       const slot = body.createDiv("dt-reply-compose");
@@ -267,17 +260,6 @@ export class TimelineView extends ItemView {
     await this.render();
   }
 
-  private async like(file: TFile, p: Post) {
-    let ok = true;
-    await this.app.vault.process(file, (d) => {
-      const out = toggleLike(d, p.lineNo, p.raw);
-      if (out === null) ok = false;
-      return out ?? d;
-    });
-    if (!ok) new Notice("対象の行が見つかりません");
-    await this.render();
-  }
-
   private postMoment(day: Day, p: Post): moment.Moment {
     const m = day.date.clone().startOf("day");
     if (p.time) {
@@ -289,22 +271,16 @@ export class TimelineView extends ItemView {
 
   private relTime(m: moment.Moment, hasTime: boolean): string {
     const now = moment();
-    const sec = now.diff(m, "seconds");
     if (!hasTime) {
       const d = now.clone().startOf("day").diff(m, "days");
-      if (d === 0) return "今日";
-      if (d === 1) return "昨日";
-      return this.absDate(m, now);
+      return d <= 0 ? "今日" : `${d}日前`;
     }
-    if (sec < 0) return this.absDate(m, now);
-    if (sec < 60) return "今";
-    if (sec < 3600) return `${Math.floor(sec / 60)}分`;
-    if (sec < 86400) return `${Math.floor(sec / 3600)}時間`;
-    if (sec < 86400 * 7) return `${Math.floor(sec / 86400)}日`;
-    return this.absDate(m, now);
-  }
-
-  private absDate(m: moment.Moment, now: moment.Moment): string {
-    return m.format(m.year() === now.year() ? "M月D日" : "YYYY年M月D日");
+    const sec = Math.max(0, now.diff(m, "seconds"));
+    if (sec < 3600) return `${Math.max(1, Math.floor(sec / 60))}分前`;
+    if (sec < 86400) return `${Math.floor(sec / 3600)}時間前`;
+    const days = Math.floor(sec / 86400);
+    if (days < 30) return `${days}日前`;
+    if (days < 365) return `${Math.floor(days / 30)}ヶ月前`;
+    return `${Math.floor(days / 365)}年前`;
   }
 }
