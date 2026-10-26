@@ -11,6 +11,7 @@ export interface TimelineSettings {
   displayName: string;
   handle: string;
   avatarPath: string;
+  collapseFrom: number;
 }
 
 const DEFAULTS: TimelineSettings = {
@@ -19,6 +20,7 @@ const DEFAULTS: TimelineSettings = {
   displayName: "name",
   handle: "name",
   avatarPath: "",
+  collapseFrom: 3,
 };
 
 export default class DailyTimelinePlugin extends Plugin {
@@ -93,7 +95,7 @@ class TimelineSettingTab extends PluginSettingTab {
     containerEl.empty();
     const s = this.plugin.settings;
 
-    const text = (name: string, desc: string, key: keyof TimelineSettings, placeholder = "") =>
+    const text = (name: string, desc: string, key: Exclude<keyof TimelineSettings, "collapseFrom">, placeholder = "") =>
       new Setting(containerEl)
         .setName(name)
         .setDesc(desc)
@@ -108,6 +110,17 @@ class TimelineSettingTab extends PluginSettingTab {
     text("Date format", "Moment format of the daily note file name.", "format", "YYYY-MM-DD");
     text("Display name", "Shown on each post.", "displayName");
     text("Handle", "Shown after the display name, without @.", "handle");
+    new Setting(containerEl)
+      .setName("Collapse replies from")
+      .setDesc("Replies are folded when a post has more than this many. 0 folds every thread.")
+      .addText((t) =>
+        t.setValue(String(s.collapseFrom)).onChange(async (v) => {
+          const n = parseInt(v, 10);
+          if (Number.isNaN(n) || n < 0) return;
+          s.collapseFrom = n;
+          await this.plugin.saveSettings();
+        })
+      );
     text("Avatar image", "Vault path to an image, e.g. attachments/me.png.", "avatarPath");
   }
 }

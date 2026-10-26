@@ -18,6 +18,7 @@ export class TimelineView extends ItemView {
   private shown = PAGE;
   private replyKey: string | null = null;
   private editKey: string | null = null;
+  private expanded = new Set<string>();
   private dirty = false;
   private renderToken = 0;
   private renderComp: Component | null = null;
@@ -229,8 +230,28 @@ export class TimelineView extends ItemView {
     }
 
     if (p.children.length) {
-      const kids = wrap.createDiv("dt-replies");
-      for (const c of p.children) this.renderPost(kids, c, day, depth + 1);
+      const total = countReplies(p);
+      const foldable = total > s.collapseFrom;
+      const open = !foldable || this.expanded.has(key) || this.replyKey === key || this.editKey === key;
+      if (open) {
+        const kids = wrap.createDiv("dt-replies");
+        for (const c of p.children) this.renderPost(kids, c, day, depth + 1);
+      }
+      if (foldable) {
+        const toggle = wrap.createEl("button", {
+          cls: "dt-more",
+          text: open ? "返信を閉じる" : `${total}件の返信を表示`,
+        });
+        toggle.addEventListener("click", () => {
+          if (open) this.expanded.delete(key);
+          else this.expanded.add(key);
+          if (open && (this.replyKey === key || this.editKey === key)) {
+            this.replyKey = null;
+            this.editKey = null;
+          }
+          void this.render();
+        });
+      }
     }
   }
 
@@ -305,6 +326,7 @@ export class TimelineView extends ItemView {
       return out ?? d;
     });
     if (!ok) new Notice("返信先が見つかりません。ノートが変更された可能性があります");
+    this.expanded.add(`${file.path}:${parent.lineNo}`);
     this.replyKey = null;
     await this.render();
   }
