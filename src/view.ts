@@ -32,7 +32,7 @@ export class TimelineView extends ItemView {
     return "Obitter";
   }
   getIcon() {
-    return "message-circle";
+    return "twitter";
   }
 
   async onOpen() {
