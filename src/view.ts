@@ -311,6 +311,8 @@ export class TimelineView extends ItemView {
     const file = await this.plugin.getOrCreateToday();
     const line = `- ${moment().format("HH:mm")} ${text.replace(/\r?\n/g, "<br>")}`;
     await this.app.vault.process(file, (d) => appendLine(d, line));
+    const top = this.listEl.querySelector<HTMLTextAreaElement>(".dt-top");
+    if (top) top.value = "";
     this.shown = Math.max(this.shown, PAGE);
     await this.render();
     this.scrollEl.scrollTop = 0;
