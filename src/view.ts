@@ -1,7 +1,7 @@
 import { Component, ItemView, Keymap, MarkdownRenderer, Notice, TFile, WorkspaceLeaf, debounce, moment, setIcon } from "obsidian";
 import type DailyTimelinePlugin from "./main";
 import { ICON_ID } from "./main";
-import { Post, appendLine, countReplies, insertReply, parsePosts, sortNewestFirst } from "./parse";
+import { Post, appendLine, countReplies, insertReply, parsePosts, replaceText, sortNewestFirst } from "./parse";
 
 export const VIEW_TYPE = "daily-timeline-view";
 const PAGE = 5;
@@ -17,6 +17,7 @@ export class TimelineView extends ItemView {
   private shown = PAGE;
   private composeOpen = false;
   private replyKey: string | null = null;
+  private editKey: string | null = null;
   private dirty = false;
   private renderToken = 0;
   private renderComp: Component | null = null;
@@ -50,6 +51,7 @@ export class TimelineView extends ItemView {
     fab.addEventListener("click", () => {
       this.composeOpen = !this.composeOpen;
       this.replyKey = null;
+      this.editKey = null;
       void this.render().then(() => this.listEl.querySelector<HTMLTextAreaElement>(".dt-compose textarea")?.focus());
     });
 
@@ -164,14 +166,44 @@ export class TimelineView extends ItemView {
       void this.app.workspace.getLeaf(Keymap.isModEvent(e)).openFile(day.file);
     });
 
-    const text = body.createDiv("dt-text");
-    void MarkdownRenderer.render(this.app, p.text, text, day.file.path, this.renderComp!);
-    text.addEventListener("click", (e) => {
-      const a = (e.target as HTMLElement).closest("a.internal-link");
-      if (!a) return;
-      e.preventDefault();
-      void this.app.workspace.openLinkText(a.getAttribute("data-href") ?? "", day.file.path, Keymap.isModEvent(e));
-    });
+    if (this.editKey === key) {
+      const slot = body.createDiv("dt-edit-compose");
+      this.renderComposer(slot, "保存", "", (t) => this.edit(day.file, p, t), {
+        initial: p.text.replace(/<br\s*\/?>/gi, "\n"),
+        onCancel: () => {
+          this.editKey = null;
+          void this.render();
+        },
+      });
+    } else {
+      const text = body.createDiv("dt-text");
+      void MarkdownRenderer.render(this.app, p.text, text, day.file.path, this.renderComp!);
+      const linkOf = (e: Event) => (e.target as HTMLElement).closest<HTMLAnchorElement>("a.internal-link");
+      text.addEventListener(
+        "click",
+        (e) => {
+          const a = linkOf(e);
+          if (!a) return;
+          e.preventDefault();
+          e.stopPropagation();
+          const href = a.getAttribute("data-href") ?? a.getAttribute("href") ?? "";
+          void this.app.workspace.openLinkText(href, day.file.path, Keymap.isModEvent(e as MouseEvent));
+        },
+        true
+      );
+      text.addEventListener("mouseover", (e) => {
+        const a = linkOf(e);
+        if (!a) return;
+        this.app.workspace.trigger("hover-link", {
+          event: e,
+          source: VIEW_TYPE,
+          hoverParent: this,
+          targetEl: a,
+          linktext: a.getAttribute("data-href") ?? "",
+          sourcePath: day.file.path,
+        });
+      });
+    }
 
     const actions = body.createDiv("dt-actions");
     const replies = countReplies(p);
@@ -181,7 +213,17 @@ export class TimelineView extends ItemView {
     replyBtn.addEventListener("click", () => {
       this.replyKey = this.replyKey === key ? null : key;
       this.composeOpen = false;
+      this.editKey = null;
       void this.render().then(() => this.listEl.querySelector<HTMLTextAreaElement>(".dt-reply-compose textarea")?.focus());
+    });
+
+    const editBtn = actions.createEl("button", { cls: "dt-action dt-edit", attr: { "aria-label": "Edit" } });
+    setIcon(editBtn.createSpan("dt-action-icon"), "pencil");
+    editBtn.addEventListener("click", () => {
+      this.editKey = this.editKey === key ? null : key;
+      this.replyKey = null;
+      this.composeOpen = false;
+      void this.render().then(() => this.listEl.querySelector<HTMLTextAreaElement>(".dt-edit-compose textarea")?.focus());
     });
 
     if (this.replyKey === key) {
@@ -195,11 +237,28 @@ export class TimelineView extends ItemView {
     }
   }
 
-  private renderComposer(parent: HTMLElement, label: string, placeholder: string, onSubmit: (t: string) => Promise<void>) {
+  private renderComposer(
+    parent: HTMLElement,
+    label: string,
+    placeholder: string,
+    onSubmit: (t: string) => Promise<void>,
+    opts: { initial?: string; onCancel?: () => void } = {}
+  ) {
     const box = parent.createDiv("dt-compose");
     const ta = box.createEl("textarea", { attr: { rows: "2", placeholder } });
+    if (opts.initial) {
+      ta.value = opts.initial;
+      requestAnimationFrame(() => {
+        ta.style.height = "auto";
+        ta.style.height = ta.scrollHeight + "px";
+      });
+    }
     const bar = box.createDiv("dt-compose-bar");
     bar.createSpan({ cls: "dt-hint", text: "Cmd/Ctrl + Enter" });
+    if (opts.onCancel) {
+      const cancel = bar.createEl("button", { cls: "dt-cancel", text: "キャンセル" });
+      cancel.addEventListener("click", () => opts.onCancel!());
+    }
     const btn = bar.createEl("button", { cls: "dt-submit", text: label });
 
     const grow = () => {
@@ -248,6 +307,19 @@ export class TimelineView extends ItemView {
     });
     if (!ok) new Notice("返信先が見つかりません。ノートが変更された可能性があります");
     this.replyKey = null;
+    await this.render();
+  }
+
+  private async edit(file: TFile, p: Post, text: string) {
+    const body = text.replace(/\r?\n/g, "<br>");
+    let ok = true;
+    await this.app.vault.process(file, (d) => {
+      const out = replaceText(d, p, body);
+      if (out === null) ok = false;
+      return out ?? d;
+    });
+    if (!ok) new Notice("対象の行が見つかりません。ノートが変更された可能性があります");
+    this.editKey = null;
     await this.render();
   }
 

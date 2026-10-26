@@ -139,7 +139,8 @@
   height: 16px;
 }
 
-.dt-view .dt-reply:hover {
+.dt-view .dt-reply:hover,
+.dt-view .dt-edit:hover {
   color: var(--interactive-accent);
 }
 
@@ -219,4 +220,16 @@
 .dt-fab .svg-icon {
   width: 24px;
   height: 24px;
+}
+
+.dt-edit-compose .dt-compose {
+  padding: 4px 0 0;
+  border-bottom: none;
+}
+
+.dt-view .dt-cancel,
+.dt-view .dt-cancel:hover {
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
 }

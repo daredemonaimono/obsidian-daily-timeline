@@ -111,3 +111,13 @@ export function sortNewestFirst(posts: Post[]): Post[] {
     .sort((a, b) => (a.t === b.t ? b.p.lineNo - a.p.lineNo : a.t < b.t ? 1 : -1))
     .map((k) => k.p);
 }
+
+export function replaceText(data: string, post: Post, newText: string): string | null {
+  const lines = data.split("\n");
+  const idx = locate(lines, post.lineNo, post.raw);
+  if (idx < 0) return null;
+  const prefix = /^(\s*(?:[-*+]|\d+\.)\s+)/.exec(post.raw)?.[1] ?? "";
+  const time = post.time ? `${post.time} ` : "";
+  lines[idx] = `${prefix}${time}${newText}${post.liked ? LIKE_MARK : ""}`;
+  return lines.join("\n");
+}
