@@ -1,0 +1,17 @@
+{
+  "name": "obsidian-daily-timeline",
+  "version": "0.1.0",
+  "description": "Obsidian plugin: browse and post to your daily notes through a Twitter-style timeline.",
+  "main": "main.js",
+  "scripts": {
+    "build": "tsc --noEmit --skipLibCheck && node esbuild.config.mjs"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.21.0",
+    "obsidian": "latest",
+    "tslib": "^2.6.0",
+    "typescript": "^5.4.0"
+  }
+}

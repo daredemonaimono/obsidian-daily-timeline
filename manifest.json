@@ -1,0 +1,9 @@
+{
+  "id": "daily-timeline",
+  "name": "Daily Timeline",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "Browse and post to your daily notes through a Twitter-style timeline.",
+  "author": "daredemonaimono",
+  "isDesktopOnly": false
+}

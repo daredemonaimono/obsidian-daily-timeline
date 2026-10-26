@@ -1,0 +1,242 @@
+.view-content.dt-view {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.dt-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px 12px;
+  flex: none;
+}
+
+.dt-scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.dt-list {
+  max-width: 640px;
+  margin: 0 auto;
+  padding-bottom: 96px;
+}
+
+.dt-day {
+  padding: 8px 16px;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.dt-empty {
+  padding: 48px 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.dt-post {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.dt-thread {
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.dt-replies .dt-thread {
+  border-bottom: none;
+}
+
+.dt-replies {
+  margin-left: 36px;
+  padding-left: 0;
+  border-left: 2px solid var(--background-modifier-border);
+}
+
+.dt-avatar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.dt-replies .dt-avatar {
+  width: 32px;
+  height: 32px;
+}
+
+.dt-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dt-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.dt-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.dt-name {
+  font-weight: 700;
+  color: var(--text-normal);
+}
+
+.dt-handle,
+.dt-dot,
+.dt-time {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.dt-time:hover {
+  text-decoration: underline;
+  color: var(--text-muted);
+}
+
+.dt-text {
+  margin-top: 2px;
+  color: var(--text-normal);
+  overflow-wrap: anywhere;
+}
+
+.dt-text p {
+  margin: 0;
+}
+
+.dt-actions {
+  display: flex;
+  gap: 40px;
+  margin-top: 6px;
+}
+
+.dt-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  background: none;
+  border: none;
+  box-shadow: none;
+  height: auto;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  cursor: pointer;
+}
+
+.dt-action-icon {
+  display: inline-flex;
+}
+
+.dt-action .svg-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.dt-reply:hover {
+  color: var(--interactive-accent);
+}
+
+.dt-like:hover,
+.dt-like.is-liked {
+  color: var(--color-red);
+}
+
+.dt-like.is-liked .svg-icon {
+  fill: currentColor;
+}
+
+.dt-compose {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.dt-reply-compose .dt-compose {
+  padding: 8px 0 0;
+  border-bottom: none;
+}
+
+.dt-compose textarea {
+  width: 100%;
+  resize: none;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  font-size: var(--font-text-size);
+  color: var(--text-normal);
+  padding: 4px 0;
+}
+
+.dt-compose textarea:focus {
+  box-shadow: none;
+}
+
+.dt-compose-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.dt-hint {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+}
+
+.dt-submit {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 4px 16px;
+}
+
+.dt-submit:hover {
+  background: var(--interactive-accent-hover);
+}
+
+.dt-submit:disabled {
+  opacity: 0.5;
+}
+
+.dt-fab {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.dt-fab:hover {
+  background: var(--interactive-accent-hover);
+}
+
+.dt-fab .svg-icon {
+  width: 24px;
+  height: 24px;
+}
