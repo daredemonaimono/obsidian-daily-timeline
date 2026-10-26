@@ -1,7 +1,7 @@
 {
   "id": "daily-timeline",
   "name": "Obitter",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "minAppVersion": "1.4.0",
   "description": "Browse and post to your daily notes through a Twitter-style timeline.",
   "author": "daredemonaimono",

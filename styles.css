@@ -233,3 +233,33 @@
   box-shadow: none;
   color: var(--text-muted);
 }
+
+.dt-suggest {
+  position: fixed;
+  z-index: var(--layer-menu);
+  max-width: 360px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-s);
+  padding: 4px;
+}
+
+.dt-suggest-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 8px;
+  border-radius: var(--radius-s);
+  color: var(--text-normal);
+  cursor: pointer;
+}
+
+.dt-suggest-item.is-active {
+  background: var(--background-modifier-hover);
+}
+
+.dt-suggest-sub {
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+}

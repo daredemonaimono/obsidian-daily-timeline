@@ -1,6 +1,7 @@
 import { Component, ItemView, Keymap, MarkdownRenderer, Notice, TFile, WorkspaceLeaf, debounce, moment, setIcon } from "obsidian";
 import type DailyTimelinePlugin from "./main";
 import { ICON_ID } from "./main";
+import { attachLinkSuggest } from "./suggest";
 import { Post, appendLine, countReplies, insertReply, parsePosts, replaceText, sortNewestFirst } from "./parse";
 
 export const VIEW_TYPE = "daily-timeline-view";
@@ -68,6 +69,7 @@ export class TimelineView extends ItemView {
 
   async onClose() {
     this.renderToken++;
+    document.querySelectorAll(".dt-suggest").forEach((e) => e.remove());
   }
 
   refresh() {
@@ -117,6 +119,7 @@ export class TimelineView extends ItemView {
     this.addChild(this.renderComp);
 
     const scrollTop = this.scrollEl.scrollTop;
+    document.querySelectorAll(".dt-suggest").forEach((e) => e.remove());
     this.listEl.empty();
 
     if (this.composeOpen) this.renderComposer(this.listEl, "ポスト", "いまどうしてる？", (t) => this.post(t));
@@ -253,6 +256,7 @@ export class TimelineView extends ItemView {
         ta.style.height = ta.scrollHeight + "px";
       });
     }
+    attachLinkSuggest(this.app, ta, "");
     const bar = box.createDiv("dt-compose-bar");
     bar.createSpan({ cls: "dt-hint", text: "Cmd/Ctrl + Enter" });
     if (opts.onCancel) {
